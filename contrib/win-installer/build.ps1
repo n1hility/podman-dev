@@ -121,8 +121,15 @@ SignItem @("podman.msi")
 insignia -ib podman-setup.exe -o engine.exe; ExitOnError
 SignItem @("engine.exe")
 
-insignia -ab engine.exe podman-setup.exe -o podman-$version$suffix-setup.exe; ExitOnError
-SignItem @("podman-$version$suffix-setup.exe")
+$file = "podman-$version$suffix-setup.exe"
+insignia -ab engine.exe podman-setup.exe -o $file; ExitOnError
+SignItem @("$file")
+
+if (Test-Path -Path shasums) {
+    $hash = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
+    Write-Output "$hash  $file" | Out-File -Append -FilePath shasums
+}
 
 Write-Host "Complete"
 Get-ChildItem "podman-$version$suffix-setup.exe"
+

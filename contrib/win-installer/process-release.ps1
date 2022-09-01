@@ -23,7 +23,7 @@ function DownloadOrSkip {
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile $file
     } Catch {
         if ($_.Exception.Response.StatusCode -eq 404) {
-            Write-Host "URL not availahble, signaling skip:"
+            Write-Host "URL not available, signaling skip:"
             Write-Host "URL: $url"
             Exit 2
         }
@@ -31,6 +31,23 @@ function DownloadOrSkip {
         throw $_.Exception
     }
 }
+
+function DownloadOptional {
+    param(
+        [Parameter(Mandatory)]
+        [string]$url,
+        [Parameter(Mandatory)]
+        [string]$file
+    )
+    $ProgressPreference = 'SilentlyContinue';
+    try {
+        Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile $file
+    } Catch {
+    }
+
+    Return
+}
+
 
 if ($args.Count -lt 1) {
     Write-Host "Usage: " $MyInvocation.MyCommand.Name "<version>"
@@ -73,6 +90,7 @@ try {
     $restore = 1
     $ProgressPreference = 'SilentlyContinue';
     DownloadOrSkip "$base_url/releases/download/$version/podman-remote-release-windows_amd64.zip"  "release.zip"
+    DownloadOptional "$base_url/releases/download/$version/shasums" ..\shasums
     Expand-Archive -Path release.zip
     $loc = Get-ChildItem -Recurse -Path . -Name win-sshproxy.exe
     if (!$loc) {
