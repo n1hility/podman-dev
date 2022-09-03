@@ -1,6 +1,6 @@
 win_installer_task:
     name: "Verify Win Installer Build"
-    depends_on:
+#    depends_on:
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
