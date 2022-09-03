@@ -23,5 +23,5 @@ win_installer_task:
             } 
         }
         # $ENV:ARTCURL/Windows%20Cross/repo/repo.tbz; CheckExit
-	Set-Location contrib\win-installer
+        Set-Location contrib\win-installer
         .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE; CheckExit
