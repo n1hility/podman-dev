@@ -14,5 +14,5 @@ win_installer_task:
         Exit $LASTEXITCODE
     main_script: | 
         refreshenv
-	Set-Location contrib\win-installer
+        Set-Location contrib\win-installer
         .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
