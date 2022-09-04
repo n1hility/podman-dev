@@ -22,7 +22,7 @@ win_installer_task:
             Exit $LASTEXITCODE
         }
         $ret = Start-Process  .\podman-4.2.0-dev-setup.exe -ArgumentList "/install /quiet WSLCheckbox=0 AllowOldWin=1 /log inst.log"
-        Get-Contents -Wait inst.log
+        Get-Content -Wait inst.log
         if ($ret.ExitCode -ne 0) {
             Write-Host "Install failed, dumping log"
             Get-Content inst.log
