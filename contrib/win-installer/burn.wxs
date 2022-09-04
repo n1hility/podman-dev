@@ -36,7 +36,7 @@
         <MsiProperty Name="INSTALLDIR" Value="[InstallFolder]" />
         <MsiProperty Name="WITH_WSL" Value="[WSLCheckbox]"/>
       </MsiPackage>
-      <ExePackage DisplayName="WSL Kernel Install" InstallCondition="WSLCheckbox" SourceFile="artifacts\podman-wslkerninst.exe"/>
+      <ExePackage DisplayName="WSL Kernel Install" InstallCondition="WSLCheckbox = 1" SourceFile="artifacts\podman-wslkerninst.exe"/>
     </Chain>
     <OptionalUpdateRegistration/>
   </Bundle>
