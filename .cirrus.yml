@@ -11,6 +11,7 @@ win_installer_task:
     install_script: | 
         Set-Service -Name wuauserv -StartupType "Manual"
         choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
-    main_script:
-        cd contrib\win-installer
+        Exit $LASTEXITCODE
+    main_script: | 
+        Set-Location contrib\win-installer
         .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
