@@ -9,6 +9,7 @@ win_installer_task:
         WIN_INSTALLER_SRC_RELEASE: 4.2.0
 #        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
     install_script: | 
+        # Update service is required for dotnet 3.5 (dep of wix)
         Set-Service -Name wuauserv -StartupType "Manual"
         choco install -y wixtoolset mingw golang archiver curl
         if ($LASTEXITCODE -ne 0) {
@@ -17,3 +18,16 @@ win_installer_task:
     main_script: | 
         Set-Location contrib\win-installer
         .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
+        if ($LASTEXITCODE -ne 0) {
+            Exit $LASTEXITCODE
+        }
+        $ret = Start-Process -PassThru -Wait .\podman-4.2.0-setup.exe -ArgumentList "/install /quiet WSLCheckbox=0 /log inst.log"
+	if ($ret.ExitCode -ne 0) {
+            Write-Host "Install failed, dumping log"
+	    Get-Content inst.log
+            Exit $ret.ExitCode
+        }
+        if (! Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe") {
+            Write-Host "Expected podman.exe, not present after install"
+            Exit 1
+        }  
