@@ -11,4 +11,5 @@ win_installer_task:
     install_script:
         - choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
     main_script:
-        ps: "Set-Location contrib\win-installer;.\\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE"
+        - cd contrib\win-installer
+        - ps: .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
