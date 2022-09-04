@@ -76,7 +76,7 @@ function CheckRequirements() {
 
 
 if ($args.Count -lt 1 -or $args[0].Length -lt 1) {
-    Write-Host "Usage: " $MyInvocation.MyCommand.Name "<version> [dev | (prod [check])]"
+    Write-Host "Usage: " $MyInvocation.MyCommand.Name "<version> [dev | (prod [check])] [release_dir]"
     Exit 1
 }
 
@@ -95,7 +95,12 @@ if ($args.Count -gt 1 -and $args[1] -eq "prod") {
     $suffix = ""
 }
 
-.\process-release.ps1 $version
+$releaseDir = ""
+if ($args.Count -gt 2) {
+    $releaseDir = $args[2]
+}
+
+.\process-release.ps1 $version $releaseDir
 if ($LASTEXITCODE -eq 2) {
     Write-Host "Skip signaled, relaying skip"
     Exit 2

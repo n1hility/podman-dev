@@ -1,13 +1,183 @@
+---
+
+# Main collection of env. vars to set for all tasks and scripts.
+env:
+    ####
+    #### Global variables used for all tasks
+    ####
+    # Name of the ultimate destination branch for this CI run, PR or post-merge.
+    DEST_BRANCH: "main"
+    # Sane (default) value for GOPROXY and GOSUMDB.
+    GOPROXY: "https://proxy.golang.org,direct"
+    GOSUMDB: "sum.golang.org"
+    # Overrides default location (/tmp/cirrus) for repo clone
+    GOPATH: &gopath "/var/tmp/go"
+    GOCACHE: "${GOPATH}/cache"
+    GOSRC: &gosrc "/var/tmp/go/src/github.com/containers/podman"
+    CIRRUS_DEFAULT_WORK: ${CIRRUS_WORKING_DIR}
+    CIRRUS_WORKING_DIR: *gosrc
+    # The default is 'sh' if unspecified
+    CIRRUS_SHELL: "/bin/bash"
+    # Save a little typing (path relative to $CIRRUS_WORKING_DIR)
+    SCRIPT_BASE: "./contrib/cirrus"
+    # Runner statistics log file path/name
+    STATS_LOGFILE_SFX: 'runner_stats.log'
+    STATS_LOGFILE: '$GOSRC/${CIRRUS_TASK_NAME}-${STATS_LOGFILE_SFX}'
+
+    ####
+    #### Cache-image names to test with (double-quotes around names are critical)
+    #### Comment out fedora-35 for podman 4.x branches.
+    ####
+    FEDORA_NAME: "fedora-36"
+    FEDORA_AARCH64_NAME: "${FEDORA_NAME}-aarch64"
+    #PRIOR_FEDORA_NAME: "fedora-35"
+    UBUNTU_NAME: "ubuntu-2204"
+
+    # Image identifiers
+    IMAGE_SUFFIX: "c5823947156488192"
+    # EC2 images
+    FEDORA_AMI: "fedora-aws-${IMAGE_SUFFIX}"
+    FEDORA_AARCH64_AMI: "fedora-podman-aws-arm64-${IMAGE_SUFFIX}"
+    # GCP Images
+    FEDORA_CACHE_IMAGE_NAME: "fedora-${IMAGE_SUFFIX}"
+    #PRIOR_FEDORA_CACHE_IMAGE_NAME: "prior-fedora-${IMAGE_SUFFIX}"
+    UBUNTU_CACHE_IMAGE_NAME: "ubuntu-${IMAGE_SUFFIX}"
+    # Container FQIN's
+    FEDORA_CONTAINER_FQIN: "quay.io/libpod/fedora_podman:${IMAGE_SUFFIX}"
+    #PRIOR_FEDORA_CONTAINER_FQIN: "quay.io/libpod/prior-fedora_podman:${IMAGE_SUFFIX}"
+    UBUNTU_CONTAINER_FQIN: "quay.io/libpod/ubuntu_podman:${IMAGE_SUFFIX}"
+
+    ####
+    #### Control variables that determine what to run and how to run it.
+    #### N/B: Required ALL of these are set for every single task.
+    ####
+    TEST_FLAVOR:             # int, sys, ext_svc, validate, automation, etc.
+    TEST_ENVIRON: host       # 'host', or 'container'
+    PODBIN_NAME: podman      # 'podman' or 'remote'
+    PRIV_NAME: root          # 'root' or 'rootless'
+    DISTRO_NV:               # any {PRIOR_,}{FEDORA,UBUNTU}_NAME value
+    VM_IMAGE_NAME:           # One of the "Google-cloud VM Images" (above)
+    CTR_FQIN:                # One of the "Container FQIN's" (above)
+
+    # Curl-command prefix for downloading task artifacts, simply add the
+    # the url-encoded task name, artifact name, and path as a suffix.
+    ARTCURL: >-
+        curl --fail --location -O
+        --url https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}
+
+# N/B: The two following tasks are critical. They build all binaries for all supported
+# OS platforms and versions on x86_64 and aarch64. On success, the contents of the repository
+# are preserved as an artifact.  This saves most subsequent tasks about
+# 3 minutes of otherwise duplicative effort.  It also ensures that the
+# exact same binaries used throughout CI testing, are available for
+# future consumption|inspection by the final 'artifacts' task.
+build_task:
+    alias: 'build'
+    name: 'Build for $DISTRO_NV'
+    # Multiarch doesn't depend on buildability in this automation context
+    # Docs: ./contrib/cirrus/CIModes.md
+    only_if: "$CIRRUS_CRON != 'multiarch'"
+    gce_instance: &standardvm
+        image_project: libpod-218412
+        zone: "us-central1-a"
+        cpu: 2
+        memory: "4Gb"
+        # Required to be 200gig, do not modify - has i/o performance impact
+        # according to gcloud CLI tool warning messages.
+        disk: 200
+        image_name: "${VM_IMAGE_NAME}"  # from stdenvars
+    matrix: &platform_axis
+        # Ref: https://cirrus-ci.org/guide/writing-tasks/#matrix-modification
+        - env: &stdenvars
+              DISTRO_NV: ${FEDORA_NAME}
+              # Not used here, is used in other tasks
+              VM_IMAGE_NAME: ${FEDORA_CACHE_IMAGE_NAME}
+              CTR_FQIN: ${FEDORA_CONTAINER_FQIN}
+              # ID for re-use of build output
+              CI_DESIRED_RUNTIME: crun
+        #- env: &priorfedora_envvars
+        #DISTRO_NV: ${PRIOR_FEDORA_NAME}
+        #VM_IMAGE_NAME: ${PRIOR_FEDORA_CACHE_IMAGE_NAME}
+        #CTR_FQIN: ${PRIOR_FEDORA_CONTAINER_FQIN}
+        #CI_DESIRED_RUNTIME: crun
+        - env: &ubuntu_envvars
+              DISTRO_NV: ${UBUNTU_NAME}
+              VM_IMAGE_NAME: ${UBUNTU_CACHE_IMAGE_NAME}
+              CTR_FQIN: ${UBUNTU_CONTAINER_FQIN}
+              CI_DESIRED_RUNTIME: runc
+    env:
+        TEST_FLAVOR: build
+    clone_script: &full_clone |
+          cd /
+          rm -rf $CIRRUS_WORKING_DIR
+          mkdir -p $CIRRUS_WORKING_DIR
+          git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+          cd $CIRRUS_WORKING_DIR
+          git remote update origin
+          if [[ -n "$CIRRUS_PR" ]]; then # running for a PR
+              git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+              git checkout pull/$CIRRUS_PR
+          else
+              git reset --hard $CIRRUS_CHANGE_IN_REPO
+          fi
+          # Some test operations & checks require a git "identity"
+          _gc='git config --file /root/.gitconfig'
+          $_gc user.email "TMcTestFace@example.com"
+          $_gc user.name "Testy McTestface"
+    setup_script:  &setup '$GOSRC/$SCRIPT_BASE/setup_environment.sh'
+    main_script: &main '/usr/bin/time --verbose --output="$STATS_LOGFILE" $GOSRC/$SCRIPT_BASE/runner.sh'
+    # Cirrus-CI is very slow uploading one file at time, and the repo contains
+    # thousands of files.  Speed this up by archiving into tarball first.
+    repo_prep_script: &repo_prep >-
+        tar cjf /tmp/repo.tbz -C $GOSRC . && mv /tmp/repo.tbz $GOSRC/
+    repo_artifacts: &repo_artifacts
+        path: ./repo.tbz
+        type: application/octet-stream
+    always: &runner_stats
+        runner_stats_artifacts:
+            path: ./*-${STATS_LOGFILE_SFX}
+            type: text/plain
+
+# There are several other important variations of podman which
+# must always build successfully.  Most of them are handled in
+# this task, though a few need dedicated tasks which follow.
+alt_build_task:
+    name: "$ALT_NAME"
+    alias: alt_build
+    # Don't create task for [CI:DOCS] or multiarch builds
+    # Docs: ./contrib/cirrus/CIModes.md
+    only_if: $CIRRUS_CRON != 'multiarch'
+    depends_on:
+        - build
+    env:
+        <<: *stdenvars
+        TEST_FLAVOR: "altbuild"
+    gce_instance: *standardvm
+    matrix:
+      - env:
+            ALT_NAME: 'Windows Cross'
+  
+    # This task cannot make use of the shared repo.tbz artifact.
+    clone_script: *full_clone
+    setup_script: *setup
+    main_script: *main
+    # Produce a new repo.tbz artifact for consumption by 'artifacts' task.
+    repo_prep_script: *repo_prep
+    repo_artifacts: *repo_artifacts
+    always: *runner_stats
+
 win_installer_task:
     name: "Verify Win Installer Build"
 #    depends_on:
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
+        PATH: "${PATH};C:\ProgramData\chocolatey\bin"
         CIRRUS_SHELL: powershell
         CIRRUS_CLONE_DEPTH: 1
-        WIN_INSTALLER_SRC_RELEASE: 4.2.0
-#        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
+        # Fake version, we are only testing the installer functions, so version doesn't matter
+        WIN_INST_VER: 9.9.9
+        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
     install_script: | 
         # Update service is required for dotnet 3.5 (dep of wix)
         Set-Service -Name wuauserv -StartupType "Manual"
@@ -16,12 +186,19 @@ win_installer_task:
             Exit 1
         }
     main_script: | 
-        Set-Location contrib\win-installer
-        .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
-        if ($LASTEXITCODE -ne 0) {
-            Exit $LASTEXITCODE
+        function CheckExit {
+            if ($LASTEXITCODE -ne 0) {
+                Exit $LASTEXITCODE 
+            }
         }
-        $ret = Start-Process -Wait -PassThru .\podman-4.2.0-dev-setup.exe -ArgumentList "/install /quiet WSLCheckbox=0 AllowOldWin=1 /log inst.log"
+        Set-Location contrib\win-installer
+
+        $ENV:ARTCURL/Windows%20Cross/repo/repo.tbz; CheckExit
+        Rename-Item -Path repo.tbz -NewName repo.tbz2 -ErrorAction Stop
+        arc unarchive repo.tbz2 -mkdirs pre-download; CheckExit
+
+        .\build.ps1 $Env:WIN_INST_VER dev pre-download; CheckExit
+        $ret = Start-Process -Wait -PassThru ".\podman-${ENV:WIN_INST_VER}-dev-setup.exe" -ArgumentList "/install /quiet WSLCheckbox=0 AllowOldWin=1 /log inst.log"
         if ($ret.ExitCode -ne 0) {
             Write-Host "Install failed, dumping log"
             Get-Content inst.log
