@@ -8,7 +8,7 @@ win_installer_task:
         CIRRUS_CLONE_DEPTH: 1
         WIN_INSTALLER_SRC_RELEASE: 4.2.0
 #        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
-    install_script:
+    install_script: | 
         Set-Service -Name wuauserv -StartupType "Manual"
         choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
     main_script:
