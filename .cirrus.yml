@@ -4,7 +4,7 @@ win_installer_task:
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
-        CIRRUS_SHELL: powershell
+#        CIRRUS_SHELL: powershell
         CIRRUS_CLONE_DEPTH: 1
         WIN_INSTALLER_SRC_RELEASE: 4.2.0
 #        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
@@ -16,12 +16,13 @@ win_installer_task:
                          archiver `
                          curl
         Exit $LASTEXITCODE
-    main_script: |
-        function CheckExit() {
-            if ($LASTEXITCODE -ne 0) {
-                Exit 1
-            } 
-        }
-        # $ENV:ARTCURL/Windows%20Cross/repo/repo.tbz; CheckExit
-        Set-Location contrib\win-installer
-        .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE; CheckExit
+    main_script:
+        ps: |
+            function CheckExit() {
+                if ($LASTEXITCODE -ne 0) {
+                    Exit 1
+                } 
+            }
+            # $ENV:ARTCURL/Windows%20Cross/repo/repo.tbz; CheckExit
+            Set-Location contrib\win-installer
+           .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE; CheckExit
