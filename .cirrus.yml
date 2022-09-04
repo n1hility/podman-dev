@@ -11,7 +11,7 @@ win_installer_task:
     install_script:
         - choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
     main_script:
-        ps: |
+        - ps: |
             function CheckExit() {
                 if ($LASTEXITCODE -ne 0) {
                     Exit 1
