@@ -32,3 +32,4 @@ win_installer_task:
             Write-Host "Expected podman.exe, not present after install"
             Exit 1
         }
+        Write-Host "Installer verification successful!"
