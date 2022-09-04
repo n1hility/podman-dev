@@ -68,8 +68,7 @@ function CheckCommand() {
     }
 }
 
-function CheckRequirements() {
-    CheckCommand "dotnet" ".NET SDK"
+function CheckRequirements() {    
     CheckCommand "gcc" "MingW CC"
     CheckCommand "candle" "WiX Toolset"
     CheckCommand "go" "Golang"
@@ -81,7 +80,7 @@ if ($args.Count -lt 1 -or $args[0].Length -lt 1) {
     Exit 1
 }
 
-$Env:Path="$Env:Path;C:\Program Files (x86)\WiX Toolset v3.11\bin"
+$Env:Path="$Env:Path;C:\Program Files (x86)\WiX Toolset v3.11\bin;C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin;;C:\Program Files\Go\bin"
 
 CheckRequirements
 

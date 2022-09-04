@@ -10,12 +10,10 @@ win_installer_task:
 #        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
     install_script: | 
         Set-Service -Name wuauserv -StartupType "Manual"
-        choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
+        choco install -y wixtoolset mingw golang archiver curl
         if ($LASTEXITCODE -ne 0) {
             Exit 1
         }
-        refreshenv
     main_script: | 
-        refreshenv
         Set-Location contrib\win-installer
         .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
