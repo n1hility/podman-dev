@@ -4,12 +4,13 @@ win_installer_task:
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
-#        CIRRUS_SHELL: powershell
+        CIRRUS_SHELL: powershell
         CIRRUS_CLONE_DEPTH: 1
         WIN_INSTALLER_SRC_RELEASE: 4.2.0
 #        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
     install_script:
-        - choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
+        Set-Service -Name wuauserv -StartupType "Manual"
+        choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
     main_script:
-        - cd contrib\win-installer
-        - ps: .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
+        cd contrib\win-installer
+        .\build.ps1 $ENV:WIN_INSTALLER_SRC_RELEASE
