@@ -21,7 +21,7 @@ win_installer_task:
         if ($LASTEXITCODE -ne 0) {
             Exit $LASTEXITCODE
         }
-        $ret = Start-Process -PassThru -Wait .\podman-4.2.0-setup.exe -ArgumentList "/install /quiet WSLCheckbox=0 /log inst.log"
+        $ret = Start-Process -PassThru -Wait .\podman-4.2.0-dev-setup.exe -ArgumentList "/install /quiet WSLCheckbox=0 /log inst.log"
         if ($ret.ExitCode -ne 0) {
             Write-Host "Install failed, dumping log"
             Get-Content inst.log
