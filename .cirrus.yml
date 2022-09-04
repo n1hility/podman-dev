@@ -22,9 +22,9 @@ win_installer_task:
             Exit $LASTEXITCODE
         }
         $ret = Start-Process -PassThru -Wait .\podman-4.2.0-setup.exe -ArgumentList "/install /quiet WSLCheckbox=0 /log inst.log"
-	if ($ret.ExitCode -ne 0) {
+        if ($ret.ExitCode -ne 0) {
             Write-Host "Install failed, dumping log"
-	    Get-Content inst.log
+            Get-Content inst.log
             Exit $ret.ExitCode
         }
         if (! Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe") {
