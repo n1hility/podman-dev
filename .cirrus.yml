@@ -9,13 +9,7 @@ win_installer_task:
         WIN_INSTALLER_SRC_RELEASE: 4.2.0
 #        CIRRUS_WORKING_DIR: "${CIRRUS_DEFAULT_WORK}"
     install_script: |
-        choco install -y wixtoolset `
-                         mingw `
-                         golang `
-                         dotnet-sdk `
-                         archiver `
-                         curl
-        Exit $LASTEXITCODE
+        choco install -y wixtoolset mingw golang dotnet-sdk archiver curl
     main_script:
         ps: |
             function CheckExit() {
