@@ -27,7 +27,7 @@ win_installer_task:
             Get-Content inst.log
             Exit $ret.ExitCode
         }
-        $ret = Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe")
+        $ret = Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe"
         if (! $ret) {
             Write-Host "Expected podman.exe, not present after install"
             Exit 1
