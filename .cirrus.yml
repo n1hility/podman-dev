@@ -172,7 +172,7 @@ win_installer_task:
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
-        PATH: "${PATH};C:\\\\ProgramData\\\\chocolatey\\\\bin"
+        PATH: "${PATH};C:\\ProgramData\\chocolatey\\bin"
         CIRRUS_SHELL: powershell
         CIRRUS_CLONE_DEPTH: 1
         # Fake version, we are only testing the installer functions, so version doesn't matter
