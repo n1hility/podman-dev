@@ -193,6 +193,7 @@ win_installer_task:
                 Exit $LASTEXITCODE 
             }
         }
+        # Drop global envs which have unix paths, defaults are fine
         Remove-Item Env:\GOPATH
         Remove-Item Env:\GOSRC
         Remove-Item Env:\GOCACHE
@@ -200,11 +201,14 @@ win_installer_task:
         Set-Location contrib\win-installer
        
         $url = "$ART_URL/Windows Cross/repo/repo.tbz"
-        ProgressPreference = 'SilentlyContinue';
+        $ProgressPreference = 'SilentlyContinue';
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
         arc unarchive repo.tbz2 .; CheckExit
 
+        # Build Installer 
         .\build.ps1 $Env:WIN_INST_VER dev repo; CheckExit
+
+        # Run the installer silently and WSL install option disabled 
         # We need AllowOldWin for server 2019 (cirrus image), can be dropped after server 2022
         $ret = Start-Process -Wait -PassThru ".\podman-${ENV:WIN_INST_VER}-dev-setup.exe" -ArgumentList "/install /quiet WSLCheckbox=0 AllowOldWin=1 /log inst.log"
         if ($ret.ExitCode -ne 0) {

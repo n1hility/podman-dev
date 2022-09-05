@@ -136,4 +136,3 @@ if (Test-Path -Path shasums) {
 
 Write-Host "Complete"
 Get-ChildItem "podman-$version$suffix-setup.exe"
-
