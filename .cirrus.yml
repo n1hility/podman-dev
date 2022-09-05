@@ -28,7 +28,7 @@ env:
     #### Cache-image names to test with (double-quotes around names are critical)
     #### Comment out fedora-35 for podman 4.x branches.
     ####
-    FEDORA_NAME: "fedora-36"
+    FEDORA_NAME: "centos-9"
     FEDORA_AARCH64_NAME: "${FEDORA_NAME}-aarch64"
     #PRIOR_FEDORA_NAME: "fedora-35"
     UBUNTU_NAME: "ubuntu-2204"
