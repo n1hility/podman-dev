@@ -151,7 +151,7 @@ alt_build_task:
     env:
         <<: *stdenvars
         TEST_FLAVOR: "altbuild"
-    gce_instance: *standardvm
+    compute_engine_instance: *standardvm
     matrix:
       - env:
             ALT_NAME: 'Windows Cross'
