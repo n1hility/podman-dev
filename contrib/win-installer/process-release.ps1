@@ -55,7 +55,7 @@ if ($args.Count -lt 1) {
 }
 
 $releaseDir = ""
-if ($args.Count -gt 1) {
+if ($args.Count -gt 1 -and $args[1].Length -gt 0) {
     $path = $args[1]
     $releaseDir = (Resolve-Path -Path "$path" -ErrorAction Stop).Path
 }
