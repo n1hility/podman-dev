@@ -78,13 +78,13 @@ build_task:
     # Docs: ./contrib/cirrus/CIModes.md
     only_if: "$CIRRUS_CRON != 'multiarch'"
     compute_engine_instance: &standardvm
-        image_project: libpod-218412
+        image_project: centos-cloud
         cpu: 2
         memory: "4Gb"
         # Required to be 200gig, do not modify - has i/o performance impact
         # according to gcloud CLI tool warning messages.
         disk: 200
-        image_name: "${VM_IMAGE_NAME}"  # from stdenvars
+        image_name: centos-stream-9-v20220822  # from stdenvars
     matrix: &platform_axis
         # Ref: https://cirrus-ci.org/guide/writing-tasks/#matrix-modification
         - env: &stdenvars
