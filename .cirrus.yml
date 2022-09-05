@@ -200,7 +200,7 @@ win_installer_task:
 
         Set-Location contrib\win-installer
        
-        $url = "$ART_URL/Windows Cross/repo/repo.tbz"
+        $url = "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
         $ProgressPreference = 'SilentlyContinue';
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
         arc unarchive repo.tbz2 .; CheckExit
