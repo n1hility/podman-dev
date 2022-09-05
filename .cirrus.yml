@@ -111,6 +111,7 @@ build_task:
           cd /
           rm -rf $CIRRUS_WORKING_DIR
           mkdir -p $CIRRUS_WORKING_DIR
+          echo git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
           git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
           cd $CIRRUS_WORKING_DIR
           git remote update origin
