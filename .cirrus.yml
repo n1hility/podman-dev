@@ -171,8 +171,8 @@ alt_build_task:
 
 win_installer_task:
     name: "Verify Win Installer Build"
-       depends_on: 
-           - alt_build
+    depends_on: 
+       - alt_build
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
