@@ -196,7 +196,7 @@ win_installer_task:
 
         # "${ENV:ARTCURL}/Windows Cross/repo/repo.tbz"; CheckExit
         Rename-Item -Path repo.tbz -NewName repo.tbz2 -ErrorAction Stop
-        arc unarchive repo.tbz2 -mkdirs pre-download; CheckExit
+        arc unarchive repo.tbz2 .; CheckExit
 
         .\build.ps1 $Env:WIN_INST_VER dev pre-download; CheckExit
         $ret = Start-Process -Wait -PassThru ".\podman-${ENV:WIN_INST_VER}-dev-setup.exe" -ArgumentList "/install /quiet WSLCheckbox=0 AllowOldWin=1 /log inst.log"
