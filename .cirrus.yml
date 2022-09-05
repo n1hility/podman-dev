@@ -107,6 +107,8 @@ build_task:
     env:
         TEST_FLAVOR: build
     clone_script: &full_clone |
+          url='https://raw.githubusercontent.com/containers/automation/master/bin/install_automation.sh'
+          curl -sL "$url" | bash -s latest
           dnf install -y git
           cd /
           rm -rf $CIRRUS_WORKING_DIR
