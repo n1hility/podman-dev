@@ -169,8 +169,8 @@ alt_build_task:
 
 win_installer_task:
     name: "Verify Win Installer Build"
-    #depends_on: 
-    #   - alt_build
+    depends_on: 
+      - alt_build
     windows_container:
         image: cirrusci/windowsservercore:2019
     env:
@@ -205,6 +205,7 @@ win_installer_task:
         arc unarchive repo.tbz2 .; CheckExit
 
         .\build.ps1 $Env:WIN_INST_VER dev repo; CheckExit
+        # We need AllowOldWin for server 2019 (cirrus image), can be dropped after server 2022
         $ret = Start-Process -Wait -PassThru ".\podman-${ENV:WIN_INST_VER}-dev-setup.exe" -ArgumentList "/install /quiet WSLCheckbox=0 AllowOldWin=1 /log inst.log"
         if ($ret.ExitCode -ne 0) {
             Write-Host "Install failed, dumping log"
@@ -214,7 +215,7 @@ win_installer_task:
         $ret = Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe" -and `
                Test-Path -Path "C:\Program Files\RedHat\Podman\win-sshproxy.exe"
         if (! $ret) {
-            Write-Host "Expected podman.exe, not present after install"
+            Write-Host "Expected podman.exe and win-sshproxy.exe, both not present after install"
             Exit 1
         }
         Write-Host "Installer verification successful!"
