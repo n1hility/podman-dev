@@ -194,7 +194,7 @@ win_installer_task:
         Set-Location contrib\win-installer
         curl.exe -O "https://api.cirrus-ci.com/v1/artifact/task/4728867700080640/repo/repo.tbz"
 
-        // "${ENV:ARTCURL}/Windows Cross/repo/repo.tbz"; CheckExit
+        # "${ENV:ARTCURL}/Windows Cross/repo/repo.tbz"; CheckExit
         Rename-Item -Path repo.tbz -NewName repo.tbz2 -ErrorAction Stop
         arc unarchive repo.tbz2 -mkdirs pre-download; CheckExit
 
