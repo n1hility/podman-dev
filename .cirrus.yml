@@ -107,7 +107,7 @@ build_task:
     env:
         TEST_FLAVOR: build
     clone_script: &full_clone |
-          dnf install -y git
+          dnf install -y git golang
           url='https://raw.githubusercontent.com/containers/automation/master/bin/install_automation.sh'
           curl -sL "$url" | bash -s latest
           cd /
