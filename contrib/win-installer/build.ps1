@@ -76,10 +76,28 @@ function CheckRequirements() {
 
 
 if ($args.Count -lt 1 -or $args[0].Length -lt 1) {
-    Write-Host "Usage: " $MyInvocation.MyCommand.Name "<version> [dev | (prod [check])] [release_dir]"
+    Write-Host "Usage: " $MyInvocation.MyCommand.Name "<version> [dev|prod] [release_dir]"
+    Write-Host
+    Write-Host 'Uses Env Vars: '
+    Write-Host '   $ENV:FETCH_BASE_URL - GitHub Repo Address to locate release on' 
+    Write-Host 'Env Settings for signing (optional)'
+    Write-Host '   $ENV:VAULT_ID'      
+    Write-Host '   $ENV:APP_ID'
+    Write-Host '   $ENV:TENANT_ID'
+    Write-Host '   $ENV:CLIENT_SECRET'
+    Write-Host '   $ENV:CERT_NAME'
+    Write-Host 
+    Write-Host "Example: Download and build from the official Github release (dev output): "
+    Write-Host " .\build.ps1 4.2.0"
+    Write-Host 
+    Write-Host "Example: Build a dev build from a pre-download release "
+    Write-Host " .\build.ps1 4.2.0 dev fetchdir"
+    Write-Host 
+
     Exit 1
 }
 
+# Pre-set to standard locations in-case build env does not refresh paths
 $Env:Path="$Env:Path;C:\Program Files (x86)\WiX Toolset v3.11\bin;C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin;;C:\Program Files\Go\bin"
 
 CheckRequirements
