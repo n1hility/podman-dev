@@ -106,7 +106,7 @@ try {
     Expand-Archive -Path release.zip
     $loc = Get-ChildItem -Recurse -Path . -Name win-sshproxy.exe
     if (!$loc) {
-        if ($releaseDir.Length() -gt 0) {
+        if ($releaseDir.Length -gt 0) {
             throw "Release dir only supports zip which includes win-sshproxy.exe"
         }
         Write-Host "Old release, zip does not include win-sshproxy.exe, fetching via msi"
