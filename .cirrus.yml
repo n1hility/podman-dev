@@ -67,12 +67,12 @@ env:
         curl --fail --location -O
         --url ${ART_URL}
 
-N/B: The two following tasks are critical. They build all binaries for all supported
-OS platforms and versions on x86_64 and aarch64. On success, the contents of the repository
-are preserved as an artifact.  This saves most subsequent tasks about
-3 minutes of otherwise duplicative effort.  It also ensures that the
-exact same binaries used throughout CI testing, are available for
-future consumption|inspection by the final 'artifacts' task.
+# N/B: The two following tasks are critical. They build all binaries for all supported
+# OS platforms and versions on x86_64 and aarch64. On success, the contents of the repository
+# are preserved as an artifact.  This saves most subsequent tasks about
+# 3 minutes of otherwise duplicative effort.  It also ensures that the
+# exact same binaries used throughout CI testing, are available for
+# future consumption|inspection by the final 'artifacts' task.
 build_task:
     alias: 'build'
     name: 'Build for $DISTRO_NV'
@@ -139,9 +139,9 @@ build_task:
             path: ./*-${STATS_LOGFILE_SFX}
             type: text/plain
 
-There are several other important variations of podman which
-must always build successfully.  Most of them are handled in
-this task, though a few need dedicated tasks which follow.
+# There are several other important variations of podman which
+# must always build successfully.  Most of them are handled in
+# this task, though a few need dedicated tasks which follow.
 alt_build_task:
     name: "$ALT_NAME"
     alias: alt_build
