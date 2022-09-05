@@ -107,6 +107,7 @@ build_task:
     env:
         TEST_FLAVOR: build
     clone_script: &full_clone |
+          dnf install git
           cd /
           rm -rf $CIRRUS_WORKING_DIR
           mkdir -p $CIRRUS_WORKING_DIR
