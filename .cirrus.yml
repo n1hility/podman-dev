@@ -59,111 +59,113 @@ env:
     VM_IMAGE_NAME:           # One of the "Google-cloud VM Images" (above)
     CTR_FQIN:                # One of the "Container FQIN's" (above)
 
+
     # Curl-command prefix for downloading task artifacts, simply add the
     # the url-encoded task name, artifact name, and path as a suffix.
+    ART_URL: https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}
     ARTCURL: >-
         curl --fail --location -O
-        --url https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}
+        --url ${ART_URL}
 
-# N/B: The two following tasks are critical. They build all binaries for all supported
-# OS platforms and versions on x86_64 and aarch64. On success, the contents of the repository
-# are preserved as an artifact.  This saves most subsequent tasks about
-# 3 minutes of otherwise duplicative effort.  It also ensures that the
-# exact same binaries used throughout CI testing, are available for
-# future consumption|inspection by the final 'artifacts' task.
-# build_task:
-#     alias: 'build'
-#     name: 'Build for $DISTRO_NV'
-#     # Multiarch doesn't depend on buildability in this automation context
-#     # Docs: ./contrib/cirrus/CIModes.md
-#     only_if: "$CIRRUS_CRON != 'multiarch'"
-#     compute_engine_instance: &standardvm
-#         image_project: fedora-cloud 
-#         cpu: 2
-#         memory: "4Gb"
-#         # Required to be 200gig, do not modify - has i/o performance impact
-#         # according to gcloud CLI tool warning messages.
-#         disk: 100
-#         image: family/fedora-cloud-36  # from stdenvars
-#     matrix: &platform_axis
-#         # Ref: https://cirrus-ci.org/guide/writing-tasks/#matrix-modification
-#         - env: &stdenvars
-#               DISTRO_NV: ${FEDORA_NAME}
-#               # Not used here, is used in other tasks
-#               VM_IMAGE_NAME: ${FEDORA_CACHE_IMAGE_NAME}
-#               CTR_FQIN: ${FEDORA_CONTAINER_FQIN}
-#               # ID for re-use of build output
-#               CI_DESIRED_RUNTIME: crun
-#         #- env: &priorfedora_envvars
-#         #DISTRO_NV: ${PRIOR_FEDORA_NAME}
-#         #VM_IMAGE_NAME: ${PRIOR_FEDORA_CACHE_IMAGE_NAME}
-#         #CTR_FQIN: ${PRIOR_FEDORA_CONTAINER_FQIN}
-#         #CI_DESIRED_RUNTIME: crun
+N/B: The two following tasks are critical. They build all binaries for all supported
+OS platforms and versions on x86_64 and aarch64. On success, the contents of the repository
+are preserved as an artifact.  This saves most subsequent tasks about
+3 minutes of otherwise duplicative effort.  It also ensures that the
+exact same binaries used throughout CI testing, are available for
+future consumption|inspection by the final 'artifacts' task.
+build_task:
+    alias: 'build'
+    name: 'Build for $DISTRO_NV'
+    # Multiarch doesn't depend on buildability in this automation context
+    # Docs: ./contrib/cirrus/CIModes.md
+    only_if: "$CIRRUS_CRON != 'multiarch'"
+    compute_engine_instance: &standardvm
+        image_project: fedora-cloud 
+        cpu: 2
+        memory: "4Gb"
+        # Required to be 200gig, do not modify - has i/o performance impact
+        # according to gcloud CLI tool warning messages.
+        disk: 100
+        image: family/fedora-cloud-36  # from stdenvars
+    matrix: &platform_axis
+        # Ref: https://cirrus-ci.org/guide/writing-tasks/#matrix-modification
+        - env: &stdenvars
+              DISTRO_NV: ${FEDORA_NAME}
+              # Not used here, is used in other tasks
+              VM_IMAGE_NAME: ${FEDORA_CACHE_IMAGE_NAME}
+              CTR_FQIN: ${FEDORA_CONTAINER_FQIN}
+              # ID for re-use of build output
+              CI_DESIRED_RUNTIME: crun
+        #- env: &priorfedora_envvars
+        #DISTRO_NV: ${PRIOR_FEDORA_NAME}
+        #VM_IMAGE_NAME: ${PRIOR_FEDORA_CACHE_IMAGE_NAME}
+        #CTR_FQIN: ${PRIOR_FEDORA_CONTAINER_FQIN}
+        #CI_DESIRED_RUNTIME: crun
 
-#     env:
-#         TEST_FLAVOR: build
-#     clone_script: &full_clone |
-#           dnf install -y git autoconf automake bash-completion bats bridge-utils btrfs-progs-devel buildah bzip2 catatonit conmon containernetworking-plugins containers-common criu crun curl device-mapper-devel dnsmasq docker-compose e2fsprogs-devel emacs-nox fakeroot file findutils fuse3 fuse3-devel gcc git git-daemon glib2-devel glibc-devel glibc-static gnupg go-md2man golang gpgme gpgme-devel grubby hostname httpd-tools iproute iptables jq krb5-workstation libassuan libassuan-devel libblkid-devel libcap-devel libffi-devel libgpg-error-devel libmsi1 libnet libnet-devel libnl3-devel libseccomp libseccomp-devel libselinux-devel libtool libxml2-devel libxslt-devel lsof make mlocate msitools nfs-utils nmap-ncat openssl openssl-devel ostree-devel pandoc parallel perl-FindBin pkgconfig podman procps-ng protobuf protobuf-c protobuf-c-devel protobuf-devel python-pip-wheel python-setuptools-wheel python-wheel-wheel python-toml python2 python3-PyYAML python3-coverage python3-dateutil python3-docker python3-fixtures python3-libselinux python3-libsemanage python3-libvirt python3-pip python3-psutil python3-pylint python3-pyxdg python3-requests python3-requests-mock redhat-rpm-config rpcbind rsync runc sed skopeo slirp4netns socat squashfs-tools tar time unzip vim wget which xz zip zlib-devel zstd
-#           url='https://raw.githubusercontent.com/containers/automation/master/bin/install_automation.sh'
-#           curl -sL "$url" | bash -s latest
-#           cd /
-#           rm -rf $CIRRUS_WORKING_DIR
-#           mkdir -p $CIRRUS_WORKING_DIR
-#           echo git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-#           git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-#           cd $CIRRUS_WORKING_DIR
-#           git remote update origin
-#           if [[ -n "$CIRRUS_PR" ]]; then # running for a PR
-#               git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
-#               git checkout pull/$CIRRUS_PR
-#           else
-#               git reset --hard $CIRRUS_CHANGE_IN_REPO
-#           fi
-#           # Some test operations & checks require a git "identity"
-#           _gc='git config --file /root/.gitconfig'
-#           $_gc user.email "TMcTestFace@example.com"
-#           $_gc user.name "Testy McTestface"
-#     setup_script:  &setup '$GOSRC/$SCRIPT_BASE/setup_environment.sh'
-#     main_script: &main '/usr/bin/time --verbose --output="$STATS_LOGFILE" $GOSRC/$SCRIPT_BASE/runner.sh'
-#     # Cirrus-CI is very slow uploading one file at time, and the repo contains
-#     # thousands of files.  Speed this up by archiving into tarball first.
-#     repo_prep_script: &repo_prep >-
-#         tar cjf /tmp/repo.tbz -C $GOSRC . && mv /tmp/repo.tbz $GOSRC/
-#     repo_artifacts: &repo_artifacts
-#         path: ./repo.tbz
-#         type: application/octet-stream
-#     always: &runner_stats
-#         runner_stats_artifacts:
-#             path: ./*-${STATS_LOGFILE_SFX}
-#             type: text/plain
+    env:
+        TEST_FLAVOR: build
+    clone_script: &full_clone |
+          dnf install -y git autoconf automake bash-completion bats bridge-utils btrfs-progs-devel buildah bzip2 catatonit conmon containernetworking-plugins containers-common criu crun curl device-mapper-devel dnsmasq docker-compose e2fsprogs-devel emacs-nox fakeroot file findutils fuse3 fuse3-devel gcc git git-daemon glib2-devel glibc-devel glibc-static gnupg go-md2man golang gpgme gpgme-devel grubby hostname httpd-tools iproute iptables jq krb5-workstation libassuan libassuan-devel libblkid-devel libcap-devel libffi-devel libgpg-error-devel libmsi1 libnet libnet-devel libnl3-devel libseccomp libseccomp-devel libselinux-devel libtool libxml2-devel libxslt-devel lsof make mlocate msitools nfs-utils nmap-ncat openssl openssl-devel ostree-devel pandoc parallel perl-FindBin pkgconfig podman procps-ng protobuf protobuf-c protobuf-c-devel protobuf-devel python-pip-wheel python-setuptools-wheel python-wheel-wheel python-toml python2 python3-PyYAML python3-coverage python3-dateutil python3-docker python3-fixtures python3-libselinux python3-libsemanage python3-libvirt python3-pip python3-psutil python3-pylint python3-pyxdg python3-requests python3-requests-mock redhat-rpm-config rpcbind rsync runc sed skopeo slirp4netns socat squashfs-tools tar time unzip vim wget which xz zip zlib-devel zstd
+          url='https://raw.githubusercontent.com/containers/automation/master/bin/install_automation.sh'
+          curl -sL "$url" | bash -s latest
+          cd /
+          rm -rf $CIRRUS_WORKING_DIR
+          mkdir -p $CIRRUS_WORKING_DIR
+          echo git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+          git clone --recursive --branch=$DEST_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+          cd $CIRRUS_WORKING_DIR
+          git remote update origin
+          if [[ -n "$CIRRUS_PR" ]]; then # running for a PR
+              git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+              git checkout pull/$CIRRUS_PR
+          else
+              git reset --hard $CIRRUS_CHANGE_IN_REPO
+          fi
+          # Some test operations & checks require a git "identity"
+          _gc='git config --file /root/.gitconfig'
+          $_gc user.email "TMcTestFace@example.com"
+          $_gc user.name "Testy McTestface"
+    setup_script:  &setup '$GOSRC/$SCRIPT_BASE/setup_environment.sh'
+    main_script: &main '/usr/bin/time --verbose --output="$STATS_LOGFILE" $GOSRC/$SCRIPT_BASE/runner.sh'
+    # Cirrus-CI is very slow uploading one file at time, and the repo contains
+    # thousands of files.  Speed this up by archiving into tarball first.
+    repo_prep_script: &repo_prep >-
+        tar cjf /tmp/repo.tbz -C $GOSRC . && mv /tmp/repo.tbz $GOSRC/
+    repo_artifacts: &repo_artifacts
+        path: ./repo.tbz
+        type: application/octet-stream
+    always: &runner_stats
+        runner_stats_artifacts:
+            path: ./*-${STATS_LOGFILE_SFX}
+            type: text/plain
 
-# There are several other important variations of podman which
-# must always build successfully.  Most of them are handled in
-# this task, though a few need dedicated tasks which follow.
-# alt_build_task:
-#     name: "$ALT_NAME"
-#     alias: alt_build
-#     # Don't create task for [CI:DOCS] or multiarch builds
-#     # Docs: ./contrib/cirrus/CIModes.md
-#     only_if: $CIRRUS_CRON != 'multiarch'
-#     depends_on:
-#         - build
-#     env:
-#         <<: *stdenvars
-#         TEST_FLAVOR: "altbuild"
-#     compute_engine_instance: *standardvm
-#     matrix:
-#       - env:
-#             ALT_NAME: 'Windows Cross'
+There are several other important variations of podman which
+must always build successfully.  Most of them are handled in
+this task, though a few need dedicated tasks which follow.
+alt_build_task:
+    name: "$ALT_NAME"
+    alias: alt_build
+    # Don't create task for [CI:DOCS] or multiarch builds
+    # Docs: ./contrib/cirrus/CIModes.md
+    only_if: $CIRRUS_CRON != 'multiarch'
+    depends_on:
+        - build
+    env:
+        <<: *stdenvars
+        TEST_FLAVOR: "altbuild"
+    compute_engine_instance: *standardvm
+    matrix:
+      - env:
+            ALT_NAME: 'Windows Cross'
   
-#     # This task cannot make use of the shared repo.tbz artifact.
-#     clone_script: *full_clone
-#     setup_script: *setup
-#     main_script: *main
-#     # Produce a new repo.tbz artifact for consumption by 'artifacts' task.
-#     repo_prep_script: *repo_prep
-#     repo_artifacts: *repo_artifacts
-#     always: *runner_stats
+    # This task cannot make use of the shared repo.tbz artifact.
+    clone_script: *full_clone
+    setup_script: *setup
+    main_script: *main
+    # Produce a new repo.tbz artifact for consumption by 'artifacts' task.
+    repo_prep_script: *repo_prep
+    repo_artifacts: *repo_artifacts
+    always: *runner_stats
 
 win_installer_task:
     name: "Verify Win Installer Build"
@@ -181,7 +183,7 @@ win_installer_task:
     install_script: | 
         # Update service is required for dotnet 3.5 (dep of wix)
         Set-Service -Name wuauserv -StartupType "Manual"
-        choco install -y wixtoolset mingw golang archiver curl
+        choco install -y wixtoolset mingw golang archiver
         if ($LASTEXITCODE -ne 0) {
             Exit 1
         }
@@ -196,10 +198,10 @@ win_installer_task:
         Remove-Item Env:\GOCACHE
 
         Set-Location contrib\win-installer
-        curl.exe -O "https://api.cirrus-ci.com/v1/artifact/task/4728867700080640/repo/repo.tbz"
-
-        # "${ENV:ARTCURL}/Windows Cross/repo/repo.tbz"; CheckExit
-        Rename-Item -Path repo.tbz -NewName repo.tbz2 -ErrorAction Stop
+       
+        $url = "$ART_URL/Windows Cross/repo/repo.tbz"
+        ProgressPreference = 'SilentlyContinue';
+        Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
         arc unarchive repo.tbz2 .; CheckExit
 
         .\build.ps1 $Env:WIN_INST_VER dev repo; CheckExit
@@ -209,7 +211,8 @@ win_installer_task:
             Get-Content inst.log
             Exit $ret.ExitCode
         }
-        $ret = Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe"
+        $ret = Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe" -and `
+               Test-Path -Path "C:\Program Files\RedHat\Podman\win-sshproxy.exe"
         if (! $ret) {
             Write-Host "Expected podman.exe, not present after install"
             Exit 1
