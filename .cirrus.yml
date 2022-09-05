@@ -107,7 +107,7 @@ build_task:
     env:
         TEST_FLAVOR: build
     clone_script: &full_clone |
-          dnf install -y git golang rsync unzip time
+          dnf install -y git autoconf automake bash-completion bats bridge-utils btrfs-progs-devel buildah bzip2 catatonit conmon containernetworking-plugins containers-common criu crun curl device-mapper-devel dnsmasq docker-compose e2fsprogs-devel emacs-nox fakeroot file findutils fuse3 fuse3-devel gcc git git-daemon glib2-devel glibc-devel glibc-static gnupg go-md2man golang gpgme gpgme-devel grubby hostname httpd-tools iproute iptables jq krb5-workstation libassuan libassuan-devel libblkid-devel libcap-devel libffi-devel libgpg-error-devel libmsi1 libnet libnet-devel libnl3-devel libseccomp libseccomp-devel libselinux-devel libtool libxml2-devel libxslt-devel lsof make mlocate msitools nfs-utils nmap-ncat openssl openssl-devel ostree-devel pandoc parallel perl-FindBin pkgconfig podman procps-ng protobuf protobuf-c protobuf-c-devel protobuf-devel python-pip-wheel python-setuptools-wheel python-wheel-wheel python-toml python2 python3-PyYAML python3-coverage python3-dateutil python3-docker python3-fixtures python3-libselinux python3-libsemanage python3-libvirt python3-pip python3-psutil python3-pylint python3-pyxdg python3-requests python3-requests-mock redhat-rpm-config rpcbind rsync runc sed skopeo slirp4netns socat squashfs-tools tar time unzip vim wget which xz zip zlib-devel zstd
           url='https://raw.githubusercontent.com/containers/automation/master/bin/install_automation.sh'
           curl -sL "$url" | bash -s latest
           cd /
