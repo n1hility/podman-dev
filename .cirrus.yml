@@ -191,6 +191,10 @@ win_installer_task:
                 Exit $LASTEXITCODE 
             }
         }
+        Remove-Item Env:\GOPATH
+        Remove-Item Env:\GOSRC
+        Remove-Item Env:\GOCACHE
+
         Set-Location contrib\win-installer
         curl.exe -O "https://api.cirrus-ci.com/v1/artifact/task/4728867700080640/repo/repo.tbz"
 
