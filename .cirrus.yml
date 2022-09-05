@@ -84,7 +84,7 @@ build_task:
         # Required to be 200gig, do not modify - has i/o performance impact
         # according to gcloud CLI tool warning messages.
         disk: 100
-        image_name: family/centos-stream-9   # from stdenvars
+        image_name: family/centos-9   # from stdenvars
     matrix: &platform_axis
         # Ref: https://cirrus-ci.org/guide/writing-tasks/#matrix-modification
         - env: &stdenvars
