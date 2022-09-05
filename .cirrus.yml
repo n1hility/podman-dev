@@ -77,9 +77,8 @@ build_task:
     # Multiarch doesn't depend on buildability in this automation context
     # Docs: ./contrib/cirrus/CIModes.md
     only_if: "$CIRRUS_CRON != 'multiarch'"
-    gce_instance: &standardvm
+    compute_engine_instance: &standardvm
         image_project: libpod-218412
-        zone: "us-central1-a"
         cpu: 2
         memory: "4Gb"
         # Required to be 200gig, do not modify - has i/o performance impact
