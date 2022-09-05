@@ -97,7 +97,7 @@ try {
     $restore = 1
     $ProgressPreference = 'SilentlyContinue';
 
-    if ($releaseDir.Length() -gt 0) {
+    if ($releaseDir.Length -gt 0) {
         Copy-Item -Path "$releaseDir/podman-remote-release-windows_amd64.zip" "release.zip"
     } else {
         DownloadOrSkip "$base_url/releases/download/$version/podman-remote-release-windows_amd64.zip"  "release.zip"
