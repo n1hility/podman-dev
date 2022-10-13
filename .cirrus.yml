@@ -10,6 +10,10 @@ check_task:
         WIN_INST_VER: 9.9.9
     main_script: | 
         Write-Output "Work:"
-        Write-Output ${CIRRUS_WORKING_DIR}
+        Write-Output $Env:CIRRUS_WORKING_DIR
+        Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+        Write-Output "Location:"
         Get-Location
+        Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+        Write-Output "ENV:"
         dir env:
