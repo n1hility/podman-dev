@@ -11,3 +11,5 @@ check_task:
     main_script: | 
         Write-Output "Work:"
         Write-Output ${CIRRUS_WORKING_DIR}
+        Get-Location
+        dir env:
