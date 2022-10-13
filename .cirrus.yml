@@ -13,7 +13,7 @@ check_task:
         Write-Output $Env:CIRRUS_WORKING_DIR
         Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
         Write-Output "Location:"
-        Get-Location
+        (Get-Location).Path
         Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
-        Write-Output "ENV:"
-        dir env:
+        Write-Output $ENV:TEMP
+        Write-Output $ENV:LOCALAPPDATA\Temp
