@@ -177,7 +177,7 @@ check_task:
     name: "Check"
     ec2_instance: &standard_build_ec2_aarch64
         image: "win-server-wsl*"
-        type: t3.large
+        type: z1d.metal 
         region: us-east-1
         platform: windows
     env:
@@ -213,4 +213,7 @@ check_task:
         Set-Location extracted
         $x = Get-ChildItem -Path bin -Recurse
         Set-Location $x
-        .\podman --version
+        .\podman machine init
+        .\podman machine start
+        Start-Sleep -Seconds 5
+        .\podman run alpine date
