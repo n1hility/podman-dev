@@ -207,8 +207,8 @@ check_task:
         $ProgressPreference = 'SilentlyContinue';
         # Arc requires extension to be "tbz2"
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
-        arc unarchive repo.tbz2 .; CheckExit
-        dir
+        arc unarchive repo.tbz3 .; CheckExit
+        Set-Location repo
         arc unarchive "podman-remote-release-windows_amd64.zip" extracted 
         Set-Location extracted
         $x = Get-ChildItem -Path bin -Recurse
