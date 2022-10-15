@@ -203,7 +203,7 @@ check_task:
 
         # Download and extract alt_build win release zip
         # $url = "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
-        $url = https://api.cirrus-ci.com/v1/artifact/task/6071517099327488/repo/repo.tbz
+        $url = "https://api.cirrus-ci.com/v1/artifact/task/6071517099327488/repo/repo.tbz"
         $ProgressPreference = 'SilentlyContinue';
         # Arc requires extension to be "tbz2"
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
