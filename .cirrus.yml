@@ -6,6 +6,7 @@ check_task:
         image: "win-server-wsl*"
         type: t3.large
         region: us-east-1
+        platform: windows
     env:
         PATH: "${PATH};C:\\ProgramData\\chocolatey\\bin"
         CIRRUS_SHELL: powershell
