@@ -80,7 +80,8 @@ build_task:
     name: 'Build for $DISTRO_NV'
     # Multiarch doesn't depend on buildability in this automation context
     # Docs: ./contrib/cirrus/CIModes.md
-    only_if: "$CIRRUS_CRON != 'multiarch'"
+    # only_if: "$CIRRUS_CRON != 'multiarch'"
+    only_if: "falsw"
     compute_engine_instance: &standardvm
         image_project: fedora-cloud 
         cpu: 2
@@ -149,7 +150,8 @@ alt_build_task:
     alias: alt_build
     # Don't create task for [CI:DOCS] or multiarch builds
     # Docs: ./contrib/cirrus/CIModes.md
-    only_if: $CIRRUS_CRON != 'multiarch'
+    only_if: "falsw"
+    # only_if: $CIRRUS_CRON != 'multiarch'
     depends_on:
         - build
     env:
@@ -170,8 +172,8 @@ alt_build_task:
     always: *runner_stats
 
 check_task:
-    depends_on:
-        - alt_build
+    # depends_on:
+    #    - alt_build
     name: "Check"
     ec2_instance: &standard_build_ec2_aarch64
         image: "win-server-wsl*"
@@ -200,11 +202,14 @@ check_task:
         Set-Location tmp
 
         # Download and extract alt_build win release zip
-        $url = "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
+        # $url = "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
+        $url = https://api.cirrus-ci.com/v1/artifact/task/6071517099327488/repo/repo.tbz
         $ProgressPreference = 'SilentlyContinue';
         # Arc requires extension to be "tbz2"
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
         arc unarchive repo.tbz2 .; CheckExit
+        Expand-Archive .\podman-remote-release-windows_amd64.zip -ErrorAction Stop
+        Set-Location .\podman-remote-release-windows_amd64 
         $x = Get-ChildItem -Path bin -Recurse
         Set-Location $x
         .\podman version
