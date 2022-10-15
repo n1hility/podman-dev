@@ -1,7 +1,11 @@
+aws_credentials: ENCRYPTED[21c833dbc0f664e4dc54072e1ec520bdb5c6b5afbd1c2cbba1dd6c08e4bd3225c654c4d6a9d3e1f0117716529f7fac27]
+
 check_task:
     name: "Check"
-    windows_container:
-        image: cirrusci/windowsservercore:2019
+    ec2_instance: &standard_build_ec2_aarch64
+        image: "win-server-wsl*"
+        type: t3.large
+        region: us-east-1
     env:
         PATH: "${PATH};C:\\ProgramData\\chocolatey\\bin"
         CIRRUS_SHELL: powershell
@@ -10,11 +14,6 @@ check_task:
         WIN_INST_VER: 9.9.9
         CIRRUS_WORKING_DIR: "${LOCALAPPDATA}\\Temp\\new-cirrus-ci-build"
     main_script: | 
-        Write-Output "Work:"
-        Write-Output $Env:CIRRUS_WORKING_DIR
-        Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
-        Write-Output "Location:"
-        (Get-Location).Path
-        Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
-        Write-Output $ENV:TEMP
-        Write-Output $ENV:LOCALAPPDATA\Temp
+        Write-Output "Works!"
+        $x = wsl --status
+        Write-Output $x
