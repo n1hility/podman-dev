@@ -208,7 +208,7 @@ check_task:
         # Arc requires extension to be "tbz2"
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
         arc unarchive repo.tbz2 .; CheckExit
-        Expand-Archive -Path podman-remote-release-windows_amd64.zip 
+        Expand-Archive -Path "podman-remote-release-windows_amd64.zip" 
         Set-Location .\podman-remote-release-windows_amd64 
         $x = Get-ChildItem -Path bin -Recurse
         Set-Location $x
