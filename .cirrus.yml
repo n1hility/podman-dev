@@ -175,7 +175,7 @@ check_task:
     # depends_on:
     #    - alt_build
     name: "Check"
-    ec2_instance: &standard_build_ec2_aarch64
+    ec2_instance:
         image: "win-server-wsl*"
         type: z1d.metal 
         region: us-east-1
@@ -216,7 +216,7 @@ check_task:
         .\podman machine init; CheckExit
         .\podman machine start; CheckExit
         for ($i =0; $i -lt 60; $i++) {
-          podman info
+          .\podman info
           if ($LASTEXITCODE -eq 0) {
             break
           }
