@@ -80,7 +80,8 @@ build_task:
     name: 'Build for $DISTRO_NV'
     # Multiarch doesn't depend on buildability in this automation context
     # Docs: ./contrib/cirrus/CIModes.md
-    only_if: "$CIRRUS_CRON != 'multiarch'"
+    # only_if: "$CIRRUS_CRON != 'multiarch'"
+    only_if: "false"
     compute_engine_instance: &standardvm
         image_project: fedora-cloud 
         cpu: 2
@@ -149,8 +150,8 @@ alt_build_task:
     alias: alt_build
     # Don't create task for [CI:DOCS] or multiarch builds
     # Docs: ./contrib/cirrus/CIModes.md
-    # only_if: "false"
-    only_if: $CIRRUS_CRON != 'multiarch'
+    only_if: "false"
+    # only_if: $CIRRUS_CRON != 'multiarch'
     depends_on:
         - build
     env:
@@ -171,8 +172,8 @@ alt_build_task:
     always: *runner_stats
 
 check_task:
-    depends_on:
-        - alt_build
+    # depends_on:
+    #    - alt_build
     name: "Check"
     ec2_instance: &standard_build_ec2_aarch64
         image: "win-server-wsl*"
@@ -201,7 +202,8 @@ check_task:
         Set-Location tmp
 
         # Download and extract alt_build win release zip
-        $url = "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
+        $url = "https://api.cirrus-ci.com/v1/artifact/task/5891954448793600/repo/repo.tbz" 
+        # "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
         $ProgressPreference = 'SilentlyContinue';
         # Arc requires extension to be "tbz2"
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
@@ -211,7 +213,17 @@ check_task:
         Set-Location extracted
         $x = Get-ChildItem -Path bin -Recurse
         Set-Location $x
-        .\podman machine init
-        .\podman machine start
-        Start-Sleep -Seconds 5
-        .\podman run alpine date
+        .\podman machine init; CheckExit
+        .\podman machine start; CheckExit
+        for ($i =0; $i -lt 60; $i++) {
+          podman info
+          if ($LASTEXITCODE -eq 0) {
+            break
+          }
+          Start-Sleep -Seconds 2
+        }
+        podman run ubi8-micro sh -c "exit 123"
+        if ($LASTEXITCODE -ne 123) {
+          Write-Output "Expected 123, got $LASTEXITCODE"
+          Exit 1
+        }
