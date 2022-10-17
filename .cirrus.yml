@@ -222,7 +222,7 @@ check_task:
           }
           Start-Sleep -Seconds 2
         }
-        podman run ubi8-micro sh -c "exit 123"
+        .\podman run ubi8-micro sh -c "exit 123"
         if ($LASTEXITCODE -ne 123) {
           Write-Output "Expected 123, got $LASTEXITCODE"
           Exit 1
