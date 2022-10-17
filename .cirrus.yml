@@ -177,7 +177,7 @@ check_task:
     name: "Check"
     ec2_instance:
         image: "win-server-wsl*"
-        type: m5zn.metal
+        type: z1d.metal
         region: us-east-1
         platform: windows
     env:
