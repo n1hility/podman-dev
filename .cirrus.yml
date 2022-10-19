@@ -206,7 +206,7 @@ check_task:
         # "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
         $ProgressPreference = 'SilentlyContinue';
         ipconfig /all
-        curl.exe -L -v -O $url
+        curl.exe -L -O $url
         # Arc requires extension to be "tbz2"
         Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
         arc unarchive repo.tbz2 .; CheckExit
@@ -221,9 +221,10 @@ check_task:
         Write-Output "Set loc."
         Set-Location $x
         ipconfig /all
-        curl.exe -L -O  -v https://github.com/containers/podman-wsl-fedora/releases/download/v36.0.48/rootfs.tar.xz
+        curl.exe -L -O  https://github.com/containers/podman-wsl-fedora/releases/download/v36.0.48/rootfs.tar.xz
+        wsl --status
         Write-Output "Starting init..."
-        .\podman machine init; CheckExit
+        .\podman machine init --image-path rootfs.tar.xz; CheckExit
         .\podman machine start; CheckExit
         for ($i =0; $i -lt 60; $i++) {
           .\podman info
