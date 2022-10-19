@@ -186,7 +186,7 @@ check_task:
         CIRRUS_CLONE_DEPTH: 1
         # Fake version, we are only testing the installer functions, so version doesn't matter
         WIN_INST_VER: 9.9.9
-        CIRRUS_WORKING_DIR: "${LOCALAPPDATA}\\Temp\\cirrus-ci-build"
+        CIRRUS_WORKING_DIR: "c:\\cirrus-ci-build"
     main_script: | 
         # Powershell doesn't exit after
         function CheckExit {
