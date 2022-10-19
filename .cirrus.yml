@@ -218,6 +218,8 @@ check_task:
         $x = Get-ChildItem -Path bin -Recurse
         Write-Output "Set loc."
         Set-Location $x
+        ipconfig /all
+        curl.exe -L -v https://github.com/containers/podman-wsl-fedora/releases/download/v36.0.48/rootfs.tar.xz
         Write-Output "Starting init..."
         .\podman machine init; CheckExit
         .\podman machine start; CheckExit
