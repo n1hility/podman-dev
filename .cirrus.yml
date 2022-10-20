@@ -200,7 +200,7 @@ check_task:
         Remove-Item Env:\GOCACHE
         mkdir tmp
         Set-Location tmp
-        
+        ec2launch get-agent-config
         Write-Output "WSL Status:"
         $x = wsl --status
         Write-Output $x
