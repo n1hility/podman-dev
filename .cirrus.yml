@@ -200,6 +200,10 @@ check_task:
         Remove-Item Env:\GOCACHE
         mkdir tmp
         Set-Location tmp
+        
+        Write-Output "WSL Status:"
+        $x = wsl --status
+        Write-Output $x
  
         # Download and extract alt_build win release zip
         $url = "https://api.cirrus-ci.com/v1/artifact/task/5891954448793600/repo/repo.tbz" 
@@ -222,7 +226,7 @@ check_task:
         Set-Location $x
         ipconfig /all
         curl.exe -L -O  https://github.com/containers/podman-wsl-fedora/releases/download/v36.0.48/rootfs.tar.xz
-        wsl --status
+    
         Write-Output "Starting init..."
         .\podman machine init --image-path rootfs.tar.xz; CheckExit
         .\podman machine start; CheckExit
