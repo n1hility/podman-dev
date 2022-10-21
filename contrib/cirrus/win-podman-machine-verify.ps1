@@ -1,7 +1,7 @@
 # Powershell doesn't exit after command failures
 function CheckExit {
     if ($LASTEXITCODE -ne 0) {
-        Exit $LASTEXITCODE
+        throw "Exit code failure = $LASTEXITCODE"
     }
 }
 
