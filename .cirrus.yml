@@ -185,4 +185,6 @@ check_task:
         CIRRUS_SHELL: powershell
         # Fake version, we are only testing the installer functions, so version doesn't matter
         CIRRUS_WORKING_DIR: "${LOCALAPPDATA}\\Temp\\cirrus-ci-build"
-    main_script: contrib/cirrus/win-podman-machine-verify.ps1
+    main_script: |
+         contrib/cirrus/win-podman-machine-verify.ps1
+         Exit $LASTEXITCODE
