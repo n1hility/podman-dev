@@ -1,14 +1,11 @@
 # Powershell doesn't exit after command failures
+# Note, due to a bug in cirrus that does not correctly evaluate exit code, 
+# errors conditions should always be thrown
 function CheckExit {
     if ($LASTEXITCODE -ne 0) {
         throw "Exit code failure = $LASTEXITCODE"
     }
 }
-
-$LASTEXITCODE = 5
-CheckExit
-
-Write-Host "shouldn't be here"
 
 # Drop global envs which have unix paths, defaults are fine
 Remove-Item Env:\GOPATH
@@ -45,8 +42,6 @@ for ($i =0; $i -lt 60; $i++) {
 Write-Output "Running container..."
 .\podman run ubi8-micro sh -c "exit 123"
 if ($LASTEXITCODE -ne 123) {
-    Write-Output "Expected 123, got $LASTEXITCODE"
-    Exit 1
+    throw  "Expected 123, got $LASTEXITCODE"
 }
 
-Exit 0
