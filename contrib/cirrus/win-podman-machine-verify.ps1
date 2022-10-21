@@ -4,6 +4,12 @@ function CheckExit {
         Exit $LASTEXITCODE
     }
 }
+
+.\podman machine init --image-path rootfs.tar.xz; CheckExit
+
+Write-Output "Shouldn't get here"
+Exit 1
+
 # Drop global envs which have unix paths, defaults are fine
 Remove-Item Env:\GOPATH
 Remove-Item Env:\GOSRC
