@@ -174,7 +174,7 @@ alt_build_task:
 check_task:
     # depends_on:
     #    - alt_build
-    name: "Check"
+    name: "Windows Smoke Test"
     ec2_instance:
         image: "win-server-wsl*"
         type: m5zn.metal
@@ -183,62 +183,6 @@ check_task:
     env:
         PATH: "${PATH};C:\\ProgramData\\chocolatey\\bin"
         CIRRUS_SHELL: powershell
-        CIRRUS_CLONE_DEPTH: 1
         # Fake version, we are only testing the installer functions, so version doesn't matter
-        WIN_INST_VER: 9.9.9
-        CIRRUS_WORKING_DIR: "c:\\cirrus-ci-build"
-    main_script: | 
-        # Powershell doesn't exit after
-        function CheckExit {
-            if ($LASTEXITCODE -ne 0) {
-                Exit $LASTEXITCODE
-            }
-        }
-        # Drop global envs which have unix paths, defaults are fine
-        Remove-Item Env:\GOPATH
-        Remove-Item Env:\GOSRC
-        Remove-Item Env:\GOCACHE
-        mkdir tmp
-        Set-Location tmp
-        & "C:\\Program Files\\Amazon\\EC2Launch\\ec2launch" get-agent-config
-        Write-Output "WSL Status:"
-        $x = wsl --status
-        Write-Output $x
- 
-        # Download and extract alt_build win release zip
-        $url = "https://api.cirrus-ci.com/v1/artifact/task/5891954448793600/repo/repo.tbz" 
-        # "${ENV:ART_URL}/Windows Cross/repo/repo.tbz"
-        $ProgressPreference = 'SilentlyContinue';
-        ipconfig /all
-        curl.exe -L -O $url
-        # Arc requires extension to be "tbz2"
-        Invoke-WebRequest -UseBasicParsing -ErrorAction Stop -Uri $url -OutFile repo.tbz2
-        arc unarchive repo.tbz2 .; CheckExit
-        Write-Output "Set loc."
-        Set-Location repo
-        Write-Output "Expand"
-        Expand-Archive -Path "podman-remote-release-windows_amd64.zip" -DestinationPath extracted 
-        Write-Output "Set loc."
-        Set-Location extracted
-        Write-Output "Find bin."
-        $x = Get-ChildItem -Path bin -Recurse
-        Write-Output "Set loc."
-        Set-Location $x
-        ipconfig /all
-        curl.exe -L -O  https://github.com/containers/podman-wsl-fedora/releases/download/v36.0.48/rootfs.tar.xz
-    
-        Write-Output "Starting init..."
-        .\podman machine init --image-path rootfs.tar.xz; CheckExit
-        .\podman machine start; CheckExit
-        for ($i =0; $i -lt 60; $i++) {
-          .\podman info
-          if ($LASTEXITCODE -eq 0) {
-            break
-          }
-          Start-Sleep -Seconds 2
-        }
-        .\podman run ubi8-micro sh -c "exit 123"
-        if ($LASTEXITCODE -ne 123) {
-          Write-Output "Expected 123, got $LASTEXITCODE"
-          Exit 1
-        }
+        CIRRUS_WORKING_DIR: "${LOCALAPPDATA}\\Temp\\cirrus-ci-build"
+    main_script: contrib/cirrus/win-podman-machine-verify.ps1
