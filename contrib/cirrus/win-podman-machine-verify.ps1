@@ -29,7 +29,7 @@ Set-Location $x
 
 # Verify extracted podman binary
 Write-Output "Starting init..."
-.\podman machine init --image-path rootfs.tar.xz; CheckExit
+.\podman machine init; CheckExit
 Write-Output "Starting podman machine..."
 .\podman machine start; CheckExit
 for ($i =0; $i -lt 60; $i++) {
@@ -44,4 +44,4 @@ Write-Output "Running container..."
 if ($LASTEXITCODE -ne 123) {
     throw  "Expected 123, got $LASTEXITCODE"
 }
-
+Exit 0
