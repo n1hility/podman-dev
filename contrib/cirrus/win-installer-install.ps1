@@ -2,5 +2,6 @@
 Set-Service -Name wuauserv -StartupType "Manual"
 choco install -y wixtoolset mingw golang archiver
 if ($LASTEXITCODE -ne 0) {
+    Write-Host "Exit code $LASTEXITCODE"
     Exit 1
 }
