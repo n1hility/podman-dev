@@ -5,11 +5,11 @@ Set-Service -Name wuauserv -StartupType "Manual"
 function retryInstall {
    param($pkg)
 
-   for ($retries=0; $retries -lt 5; $retries++) {
+   for ($retries=0;; $retries++) {
      choco install -y $pkg
-     if ($LASTEXITCODE -eq 0) {
+     if ($LASTEXITCODE -eq 0) -or ($retries -gt 4) {
         return
-     } 
+     }
      Start-Sleep -Seconds 6
    }
 }
