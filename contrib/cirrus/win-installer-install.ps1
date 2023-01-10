@@ -18,4 +18,4 @@ function retryInstall {
      }
    }
 }
-retryInstall wixtoolset mingw golang archiver 
+retryInstall wixtoolset mingw@11.2 golang archiver 
