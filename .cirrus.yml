@@ -75,7 +75,7 @@ win_installer_task:
     env:
         PATH: "${PATH};C:\\ProgramData\\chocolatey\\bin"
         CIRRUS_SHELL: powershell
-        ART_URL: "https://api.cirrus-ci.com/v1/artifact/build/4777763966550016"
+        ART_URL: "https://api.cirrus-ci.com/v1/artifact/build/6561424021913600"
         # Fake version, we are only testing the installer functions, so version doesn't matter
         WIN_INST_VER: 9.9.9
         CIRRUS_WORKING_DIR: "${LOCALAPPDATA}\\Temp\\cirrus-ci-build"
