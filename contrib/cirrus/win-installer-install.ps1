@@ -6,8 +6,11 @@ function retryInstall {
    param($pkg)
 
    for ($retries=0;; $retries++) {
+     if ($retries -gt 5) {
+        throw "Could not install package $pkg"
+     }
      choco install -y $pkg
-     if (($LASTEXITCODE -eq 0) -or ($retries -gt 4)) {
+     if (($LASTEXITCODE -eq 0) {
         return
      }
      Write-Output "Error installing, waiting before retry"
@@ -15,6 +18,4 @@ function retryInstall {
    }
 }
 retryInstall blah
-if ($LASTEXITCODE -ne 0) {
-   throw "Exit code failure = $LASTEXITCODE"
-}
+retryInstall mingw
