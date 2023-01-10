@@ -7,9 +7,10 @@ function retryInstall {
 
    for ($retries=0;; $retries++) {
      choco install -y $pkg
-     if ($LASTEXITCODE -eq 0) -or ($retries -gt 4) {
+     if (($LASTEXITCODE -eq 0) -or ($retries -gt 4)) {
         return
      }
+     Write-Output "Error installing, waiting before retry"
      Start-Sleep -Seconds 6
    }
 }
