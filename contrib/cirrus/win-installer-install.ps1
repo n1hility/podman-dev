@@ -2,11 +2,18 @@
 Set-Service -Name wuauserv -StartupType "Manual"
 #choco install -y wixtoolset mingw golang archiver
 
-$retries=0
-while (($LASTEXITCODE -ne 0) -and  ($retries -lt 5)) {
-  choco install -y blah
-  $retries++
+function retryInstall {
+   param($pkg)
+
+   for ($retries=0; $retries -lt 5; $retries++) {
+     choco install -y $pkg
+     if ($LASTEXITCODE -eq 0) {
+        return
+     } 
+     Start-Sleep -Seconds 6
+   }
 }
+retryInstall blah
 if ($LASTEXITCODE -ne 0) {
    throw "Exit code failure = $LASTEXITCODE"
 }
