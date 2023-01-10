@@ -1,6 +1,5 @@
 # Update service is required for dotnet 3.5 (dep of wix)
 Set-Service -Name wuauserv -StartupType "Manual"
-#choco install -y wixtoolset mingw golang archiver
 
 function retryInstall {
    param([Parameter(ValueFromRemainingArguments)] [string[]] $pkgs)
@@ -14,9 +13,9 @@ function retryInstall {
          if ($LASTEXITCODE -eq 0) {
            break
          }
-         Write-Output "Error installing, waiting before retry"
+         Write-Output "Error installing, waiting before retry..."
          Start-Sleep -Seconds 6
      }
    }
 }
-retryInstall blah mingw
+retryInstall wixtoolset mingw golang archiver 
