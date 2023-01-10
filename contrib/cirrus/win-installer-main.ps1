@@ -55,6 +55,6 @@ if ($ret.ExitCode -ne 0) {
 if (! ((Test-Path -Path "C:\Program Files\RedHat\Podman\podman.exe") -and `
        (Test-Path -Path "C:\Program Files\RedHat\Podman\win-sshproxy.exe"))) {
     throw "Expected podman.exe and win-sshproxy.exe, one or both not present after install"
-    
 }
 Write-Host "Installer verification successful!"
+
